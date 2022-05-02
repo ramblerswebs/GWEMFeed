@@ -60,13 +60,17 @@ class GwemWalk {
 
     public function __construct($wm_walk) {
 
-        $this->id = $wm_walk->id;
+        //$this->id = $wm_walk->id;
+        $this->id = str_replace("WM", "", $wm_walk->id); // This should be removed post testing
         $this->status = new stdClass();
         $this->status->value = ($wm_walk->status == "confirmed") ? "published" : "cancelled";
 
         $this->difficulty = new stdClass();
-        $this->difficulty->text = ($wm_walk->difficulty != false) ? $wm_walk->difficulty->description : "Unknown";;
-
+        $this->difficulty->text = ($wm_walk->difficulty != false) ? $wm_walk->difficulty->description : "Unknown";
+        // Correct the case sensitivity
+        if ($this->difficulty->text == "Easy access") {
+            $this->difficulty->text = "Easy Access";
+        }
         $this->strands = new stdClass();
         $this->strands->items = array();
         $this->linkedEvent = new stdClass();
@@ -74,23 +78,24 @@ class GwemWalk {
         $this->festivals = new stdClass();
         $this->festivals->items = array();
         $this->walkContact = new stdClass();
-        $this->walkContact->Contact = new stdClass();
+        $this->walkContact->contact = new stdClass();
         if ($wm_walk->walk_leaders[0] != null)
         {
-            $this->walkContact->Contact->DisplayName = $wm_walk->walk_leaders[0]->name ;                                    // walk_leaders
-            $this->walkContact->Contact->Email = $wm_walk->walk_leaders[0]->email_form;
-            $this->walkContact->Contact->Telephone1 = $wm_walk->walk_leaders[0]->telephone;
+            $this->walkContact->contact->displayName = $wm_walk->walk_leaders[0]->name ;                                    // walk_leaders
+            $this->walkContact->contact->email = $wm_walk->walk_leaders[0]->email_form;
+            $this->walkContact->contact->telephone1 = $wm_walk->walk_leaders[0]->telephone;
             $this->walkLeader = $wm_walk->walk_leaders[0]->name ;                              // walk_leaders         
         }
         else{
-            $this->walkContact->Contact->DisplayName = "Not Set" ;                                    // walk_leaders
-            $this->walkContact->Contact->Email = "Not Set";
-            $this->walkContact->Contact->Telephone1 = "Not Set";
+            $this->walkContact->contact->displayName = "Not Set" ;                                    // walk_leaders
+            $this->walkContact->contact->email = "Not Set";
+            $this->walkContact->contact->telephone1 = "Not Set";
             $this->walkLeader = $wm_walk->walk_leaders[0]->name ;                              // walk_leaders         
 
         }
-        $this->walkContact->Contact->Telephone2 = "";
-        $this->walkContact->Contact->GroupCode = $wm_walk->group_code;
+        $this->walkContact->isWalkLeader = true;
+        $this->walkContact->contact->telephone2 = "";
+        $this->walkContact->contact->groupCode = $wm_walk->group_code;
 
         $this->linkedWalks = new stdClass();
         $this->linkedWalks->items = array();
@@ -99,7 +104,7 @@ class GwemWalk {
         $this->description = $wm_walk->description ;
         $this->groupCode = $wm_walk->group_code;
         $this->groupName = $wm_walk->group_name;
-        $this->additionalNotes = null;
+        $this->additionalNotes = "";
         $walkDate = DateTime::createFromFormat(self::WM_TIMEFORMAT, $wm_walk->start_date_time);
         $walkDate->setTime(0,0,0,0);
         $this->date = $walkDate->format(self::GWEM_TIMEFORMAT);   
@@ -117,7 +122,7 @@ class GwemWalk {
         $this->specialStatus->items = array();
         $this->facilities = new stdClass();                       // facilities
         $this->facilities->items = array();
-        $this->pace = null;
+        $this->pace = "";
         $this->ascentMetres = $wm_walk->ascent_metres;
         $this->ascentFeet = $wm_walk->ascent_feet;
         $this->gradeLocal = ($wm_walk->difficulty != false) ? $wm_walk->difficulty->description : "Unknown";;
@@ -125,30 +130,29 @@ class GwemWalk {
         $this->attendanceNonMembers = null;
         $this->attendanceChildren = null;
         $this->cancellationReason = $wm_walk->cancellation_reason;
-        $this->dateUpdated = $wm_walk->date_updated; // CHECK FORMAT
-        $this->dateCreated = $wm_walk->date_created; // CHECK FORMAT
+        $dateUpdated = DateTime::createFromFormat(self::WM_TIMEFORMAT, $wm_walk->date_updated);
+        $this->dateUpdated = $dateUpdated->format("Y-m-d\TH:i:sP"); 
+        $dateCreated = DateTime::createFromFormat(self::WM_TIMEFORMAT, $wm_walk->date_created);
+        $this->dateCreated = $dateCreated->format("Y-m-d\TH:i:sP"); 
         $this->media = array();
+
         // Build up the points to store
         $this->points = array() ;                      // start_location, meeting_location
         if ($wm_walk->start_location)
         {
             $len = count($this->points);
-            $this->points[$len] = $this->location2point($wm_walk->start_location, "start");
+            $this->points[$len] = $this->location2point($wm_walk->start_location, "Start");
         }
         if ($wm_walk->meeting_location)
         {
             $len = count($this->points);
-            $this->points[$len] = $this->location2point($wm_walk->meeting_location, "meeting");
+            $this->points[$len] = $this->location2point($wm_walk->meeting_location, "Meeting");
         }
         if ($wm_walk->finish_location)
         {
             $len = count($this->points);
-            $this->points[$len] = $this->location2point($wm_walk->finish_location, "finish");
+            $this->points[$len] = $this->location2point($wm_walk->finish_location, "End");
         }
-        //if ($wm_walk->start_locationarray_push($this->points, new GwemPoint($wm_walk->start_location, 'Start'));
-        //if ($wm_walk->meeting_location != null) {
-        //    array_push($this->points, new GwemPoint($wm_walks->meeting_location, 'Meeting'));
-        //}
         $this->groupInvite = new stdClass(); 
         $this->groupInvite->groupCode = null;       // groups_invited   ??
         $this->isLinear = strtolower($wm_walk->shape) == "linear" ? TRUE : FALSE; 
@@ -159,19 +163,19 @@ class GwemWalk {
     {
         $point = new stdClass();
 
-        $point->Description = $location->description ;
-        $point->GridRef = $location->grid_reference_6;
-        $point->Latitude = $location->latitude;
-        $point->Longitude = $location->longitude;
-        $point->Postcode = $location->postcode;
+        $point->description = $location->description ;
+        $point->gridRef = $location->grid_reference_6;
+        $point->latitude = $location->latitude;
+        $point->longitude = $location->longitude;
+        $point->postcode = $location->postcode;
+        $point->postcodeLatitude = 0;
+        $point->postcodeLongitude = 0;
 //        $point->Easting = "";
 //        $point->Northing = "";
-//        $point->PostcodeLatitude = "";
-//        $point->PostcodeLongitude = "";
-        $point->ShowExact = true;
+        $point->showExact = true;
         $pointTime = DateTime::createFromFormat(self::WM_TIMEFORMAT, $location->date_time);
-        $point->Time = $pointTime->format('H:i:s');                               // finish_date_time
-        $point->TypeString = $typeString;
+        $point->time = $pointTime->format('H:i:s');                               // finish_date_time
+        $point->typeString = $typeString;
         return $point;
     }
 }

@@ -16,7 +16,7 @@ define("WALKMANAGER", "https://virtserver.swaggerhub.com/abateman/Ramblers-third
 //define("RAMBLERSWEBSSITES", "https://sites.ramblers-webs.org.uk/feed.php");
 define("BR", "<br>");
 define("USECACHE", "0");    // Default option as to whether to use a cache store
-define("USEGWEM", "0");     // Default option as to whether to search GWEM for details
+define("USEGWEM", "1");     // Default option as to whether to search GWEM for details
 define("USEWM", "1");       // Default option as to whether to search Walks Manager for details
 
 // 	First Release
