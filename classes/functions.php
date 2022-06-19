@@ -118,11 +118,37 @@ class Functions {
         $walks = array();
         foreach($wm_walks as $wm_walk)
         {
-            $gwem_walk = new GwemWalk($wm_walk);
-            array_push($walks, $gwem_walk);
+            try {
+                $gwem_walk = new GwemWalk($wm_walk);
+                array_push($walks, $gwem_walk);    
+            }
+            catch (Error $e)
+            {
+                // Ensure the error is logged and 
+                wm_error($e, $wm_walk, null, false);
+                continue;
+            }
         }
         // Return the number of walks found
         return $walks;
+    }
+
+    public static function wm_error(Error $e, $wm_walk, $msg, $die = false)
+    {
+        $logfile = $_SERVER['DOCUMENT_ROOT'] . "/wm_error_log.txt" ;
+        if ($wm_walk) {
+            // Error was associated to a walk so log the walk details
+            error_log("\n\nError Converting Walks Manager Feed (walk id - " . $wm_walk->id . "): " . $e, 3, $logfile);
+        }
+        else {
+            // Error raised was not associated to a walk, log the message provided
+            error_log("\n\n" . $msg . "\n" . $e, 3, $logfile);
+        }
+        if ($die)
+        {
+            error_log("\n Exiting service as error has requested to die. ", 3, $logfile);
+            die();
+        }
     }
 
     public static function getWalkFileName($base, $groupCode)

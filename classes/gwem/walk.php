@@ -14,7 +14,8 @@
 
 class GwemWalk {
 
-    const WM_TIMEFORMAT = "Y-m-d\TH:i:s.vZ";
+//    const WM_TIMEFORMAT = "Y-m-d\TH:i:s.vZ";
+    const WM_TIMEFORMAT = "Y-m-d\TH:i:s";
     const GWEM_TIMEFORMAT = "Y-m-d\TH:i:s";
 
 
@@ -60,10 +61,11 @@ class GwemWalk {
 
     public function __construct($wm_walk) {
 
-        //$this->id = $wm_walk->id;
-        $this->id = str_replace("WM", "", $wm_walk->id); // This should be removed post testing
+        $this->id = $wm_walk->id;
+        //$this->id = str_replace("WM", "", $wm_walk->id); // This should be removed post testing
         $this->status = new stdClass();
         $this->status->value = ($wm_walk->status == "confirmed") ? "published" : "cancelled";
+        $this->status->value = "published";
 
         $this->difficulty = new stdClass();
         $this->difficulty->text = ($wm_walk->difficulty != false) ? $wm_walk->difficulty->description : "Unknown";
@@ -90,7 +92,8 @@ class GwemWalk {
             $this->walkContact->contact->displayName = "Not Set" ;                                    // walk_leaders
             $this->walkContact->contact->email = "Not Set";
             $this->walkContact->contact->telephone1 = "Not Set";
-            $this->walkLeader = $wm_walk->walk_leaders[0]->name ;                              // walk_leaders         
+            //$this->walkLeader = $wm_walk->walk_leaders[0]->name ;                              // walk_leaders         
+            $this->walkLeader = "Not Set";                              // walk_leaders         
 
         }
         $this->walkContact->isWalkLeader = true;
@@ -106,12 +109,14 @@ class GwemWalk {
         $this->groupName = $wm_walk->group_name;
         $this->additionalNotes = "";
         $walkDate = DateTime::createFromFormat(self::WM_TIMEFORMAT, $wm_walk->start_date_time);
-        $walkDate->setTime(0,0,0,0);
-        $this->date = $walkDate->format(self::GWEM_TIMEFORMAT);   
+        if ($walkDate) {
+            $walkDate->setTime(0,0,0,0); 
+            $this->date = $walkDate->format(self::GWEM_TIMEFORMAT);   
+        }
         $this->distanceKM = $wm_walk->distance_km;
         $this->distanceMiles = $wm_walk->distance_miles;
         $walkFinishTime = DateTime::createFromFormat(self::WM_TIMEFORMAT, $wm_walk->finish_date_time);
-        $this->finishTime = $walkFinishTime->format('H:i:s');                               // finish_date_time
+        if ($walkFinishTime) { $this->finishTime = $walkFinishTime->format('H:i:s');   }                            // finish_date_time
         $this->suitability = new stdClass();
         $this->suitability->items = array();
         $this->surroundings = new stdClass();
@@ -131,9 +136,9 @@ class GwemWalk {
         $this->attendanceChildren = null;
         $this->cancellationReason = $wm_walk->cancellation_reason;
         $dateUpdated = DateTime::createFromFormat(self::WM_TIMEFORMAT, $wm_walk->date_updated);
-        $this->dateUpdated = $dateUpdated->format("Y-m-d\TH:i:sP"); 
+        if ($dateUpdated) { $this->dateUpdated = $dateUpdated->format("Y-m-d\TH:i:sP"); }
         $dateCreated = DateTime::createFromFormat(self::WM_TIMEFORMAT, $wm_walk->date_created);
-        $this->dateCreated = $dateCreated->format("Y-m-d\TH:i:sP"); 
+        if ($dateCreated) { $this->dateCreated = $dateCreated->format("Y-m-d\TH:i:sP"); }
         $this->media = array();
 
         // Build up the points to store
@@ -174,7 +179,8 @@ class GwemWalk {
 //        $point->Northing = "";
         $point->showExact = true;
         $pointTime = DateTime::createFromFormat(self::WM_TIMEFORMAT, $location->date_time);
-        $point->time = $pointTime->format('H:i:s');                               // finish_date_time
+        if ($pointTime) { $point->time = $pointTime->format('H:i:s'); }                              
+        // finish_date_time
         $point->typeString = $typeString;
         return $point;
     }
