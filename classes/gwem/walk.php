@@ -65,7 +65,6 @@ class GwemWalk {
         //$this->id = str_replace("WM", "", $wm_walk->id); // This should be removed post testing
         $this->status = new stdClass();
         $this->status->value = ($wm_walk->status == "confirmed") ? "published" : "cancelled";
-        $this->status->value = "published";
 
         $this->difficulty = new stdClass();
         $this->difficulty->text = ($wm_walk->difficulty != false) ? $wm_walk->difficulty->description : "Unknown";
@@ -81,12 +80,12 @@ class GwemWalk {
         $this->festivals->items = array();
         $this->walkContact = new stdClass();
         $this->walkContact->contact = new stdClass();
-        if ($wm_walk->walk_leaders[0] != null)
+        if ($wm_walk->walk_leader != null)
         {
-            $this->walkContact->contact->displayName = $wm_walk->walk_leaders[0]->name ;                                    // walk_leaders
-            $this->walkContact->contact->email = $wm_walk->walk_leaders[0]->email_form;
-            $this->walkContact->contact->telephone1 = $wm_walk->walk_leaders[0]->telephone;
-            $this->walkLeader = $wm_walk->walk_leaders[0]->name ;                              // walk_leaders         
+            $this->walkContact->contact->displayName = $wm_walk->walk_leader->name ;                                    // walk_leaders
+            $this->walkContact->contact->email = $wm_walk->walk_leader->email_form;
+            $this->walkContact->contact->telephone1 = $wm_walk->walk_leader->telephone;
+            $this->walkLeader = $wm_walk->walk_leader->name ;                              // walk_leaders         
         }
         else{
             $this->walkContact->contact->displayName = "Not Set" ;                                    // walk_leaders
