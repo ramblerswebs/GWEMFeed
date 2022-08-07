@@ -85,14 +85,13 @@ class GwemWalk {
             $this->walkContact->contact->displayName = $wm_walk->walk_leader->name ;                                    // walk_leaders
             $this->walkContact->contact->email = $wm_walk->walk_leader->email_form;
             $this->walkContact->contact->telephone1 = $wm_walk->walk_leader->telephone;
-            $this->walkLeader = $wm_walk->walk_leader->name ;                              // walk_leaders         
+            $this->walkLeader = $wm_walk->walk_leaders->name ;                              // walk_leaders         
         }
         else{
-            $this->walkContact->contact->displayName = "Not Set" ;                                    // walk_leaders
-            $this->walkContact->contact->email = "Not Set";
-            $this->walkContact->contact->telephone1 = "Not Set";
-            //$this->walkLeader = $wm_walk->walk_leaders[0]->name ;                              // walk_leaders         
-            $this->walkLeader = "Not Set";                              // walk_leaders         
+            $this->walkContact->contact->displayName = "Not Available" ;                                    // walk_leaders
+            $this->walkContact->contact->email = "Not Available";
+            $this->walkContact->contact->telephone1 = "Not Available";
+            $this->walkLeader = "Not Available";                              // walk_leaders         
 
         }
         $this->walkContact->isWalkLeader = true;
@@ -109,12 +108,18 @@ class GwemWalk {
         $this->additionalNotes = "";
         $walkDate = DateTime::createFromFormat(self::WM_TIMEFORMAT, $wm_walk->start_date_time);
         if ($walkDate) {
-            $walkDate->setTime(0,0,0,0); 
+            try {
+                    $walkDate->setTime(0,0,0,0); 
+                }
+            catch (Exception $e)
+                {
+                    $a = $e;
+                }
             $this->date = $walkDate->format(self::GWEM_TIMEFORMAT);   
         }
         $this->distanceKM = $wm_walk->distance_km;
         $this->distanceMiles = $wm_walk->distance_miles;
-        $walkFinishTime = DateTime::createFromFormat(self::WM_TIMEFORMAT, $wm_walk->finish_date_time);
+        $walkFinishTime = DateTime::createFromFormat(self::WM_TIMEFORMAT, $wm_walk->end_date_time);
         if ($walkFinishTime) { $this->finishTime = $walkFinishTime->format('H:i:s');   }                            // finish_date_time
         $this->suitability = new stdClass();
         $this->suitability->items = array();
@@ -145,17 +150,17 @@ class GwemWalk {
         if ($wm_walk->start_location)
         {
             $len = count($this->points);
-            $this->points[$len] = $this->location2point($wm_walk->start_location, "Start");
+            $this->points[$len] = $this->location2point($wm_walk->start_location, "Start", $wm_walk->start_date_time);
         }
         if ($wm_walk->meeting_location)
         {
             $len = count($this->points);
-            $this->points[$len] = $this->location2point($wm_walk->meeting_location, "Meeting");
+            $this->points[$len] = $this->location2point($wm_walk->meeting_location, "Meeting", $wm_walk->meeting_date_time);
         }
         if ($wm_walk->finish_location)
         {
             $len = count($this->points);
-            $this->points[$len] = $this->location2point($wm_walk->finish_location, "End");
+            $this->points[$len] = $this->location2point($wm_walk->finish_location, "End", $wm_walk->end_date_time);
         }
         $this->groupInvite = new stdClass(); 
         $this->groupInvite->groupCode = null;       // groups_invited   ??
@@ -163,7 +168,7 @@ class GwemWalk {
         $this->url = $wm_walk->url;
     }
 
-    private function location2point($location, $typeString)
+    private function location2point($location, $typeString, $tmPoint)
     {
         $point = new stdClass();
 
@@ -177,7 +182,7 @@ class GwemWalk {
 //        $point->Easting = "";
 //        $point->Northing = "";
         $point->showExact = true;
-        $pointTime = DateTime::createFromFormat(self::WM_TIMEFORMAT, $location->date_time);
+        $pointTime = DateTime::createFromFormat(self::WM_TIMEFORMAT, $tmPoint);
         if ($pointTime) { $point->time = $pointTime->format('H:i:s'); }                              
         // finish_date_time
         $point->typeString = $typeString;
