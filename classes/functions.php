@@ -191,9 +191,10 @@ class Functions {
         }
         else
         { // There are no specific id's, so standard searching
+            $url = $url . '&groups=' ;
             if ($groupCode != null)
             {
-                $url = $url . '&groups=' . $groupCode ;
+                $url = $url . $groupCode ;
             }    
         }
         return $url ;
