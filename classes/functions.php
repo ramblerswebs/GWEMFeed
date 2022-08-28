@@ -133,6 +133,13 @@ class Functions {
         return $walks;
     }
 
+    public static function wm_log($msg)
+    {
+        $logfile = $_SERVER['DOCUMENT_ROOT'] . "/wm_log.txt" ;
+        // Log the Message but prepend the date and time. 
+        error_log(date(SELF::TIMEFORMAT) . " - " . $msg . "\n", 3, $logfile);
+    }
+
     public static function wm_error(Error $e, $wm_walk, $msg, $die = false)
     {
         $logfile = $_SERVER['DOCUMENT_ROOT'] . "/wm_error_log.txt" ;
@@ -164,39 +171,79 @@ class Functions {
         return $filename;
     }
 
-    public static function getGWEMFeedURL($base, $groupCode, $ids)
+    public static function ValidateWMURLParameters($urlOpts)
+    {
+/*
+        $urlOpts->date_start = $date_start;
+        $urlOpts->date_end = $date_end;
+        $urlOpts->groupCode = $groupCode;
+        $urlOpts->days = $days;
+        $urlOpts->limit = $limit;
+*/
+        try 
+        {
+            if ($urlOpts->date_start == null)
+            {
+                $now = date("Y-m-d");
+                $urlOpts->date_start = $now;
+            }
+            if ($urlOpts->date_end == null)
+            {
+                // Add 6 months of walks
+                $date=date_create($urlOpts->date_start);
+                date_add($date,date_interval_create_from_date_string("12 months"));
+                $urlOpts->date_end = date_format($date, "Y-m-d");
+            }
+            // Default to 1000 records
+            if ($urlOpts->limit == null) { $urlOpts->limit = 1000; }
+            if ($urlOpts->days == null) { $urlOpts->days = "monday,tuesday,wednesday,thursday,friday,saturday,sunday"; }
+            // Force to lowercase
+            $days = strtolower($days) ;
+        }
+        catch (Error $e)
+        {
+            Functions::wm_error($e, null, "Failed to default URL Parameters", true);
+        }
+            
+        return true;
+    }
+
+    public static function getGWEMFeedURL($base, $urlOpts)
     {
         $url = $base ;
-        if ($ids != null)
+        if ($urlOpts->ids != null)
         {
-            $url = $url . '/' . $ids;
+            $url = $url . '/' . $urlOpts->ids;
         }
         else
         {
-            if ($groupCode != null)
+            if ($urlOpts->groupCode != null)
             {
-                $url = $url . '?groups=' . $groupCode ;
+                $url = $url . '?groups=' . $urlOpts->groupCode ;
             }                
         }
         return $url ;
     }
 
-    public static function getWMFeedURL($base, $groupCode, $ids)
+    public static function getWMFeedURL($base, $urlOpts)
     {
         $url = $base ;
-        if ($ids != null)
+        if ($urlOpts->ids != null)
         {
             // walk id's have been specified so we need to return specific walks
-            $url = $url . '&ids=' . $ids;
+            $url = $url . '&ids=' . $urlOpts->ids;
         }
         else
         { // There are no specific id's, so standard searching
-            $url = $url . '&groups=' ;
-            if ($groupCode != null)
+            if ($urlOpts->groupCode != null)
             {
-                $url = $url . $groupCode ;
-            }    
+                $url = $url . '&groups=' . $urlOpts->groupCode ;
+            }
+            $url = $url . '&date=' . $urlOpts->date_start  . '&date_end=' . $urlOpts->date_end ;  
+            $url = $url . '&limit=' . $urlOpts->limit;
+            $url = $url . '&days=' . $urlOpts->days;  
         }
+        Functions::wm_log($url);
         return $url ;
     }
     public static function startsWith($haystack, $needle) {

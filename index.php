@@ -5,6 +5,7 @@ ini_set('display_errors', 1);
 ini_set('assert.warning', 1);
 ini_set('default_socket_timeout', 120);
 
+define("SITE_ROOT","http://gwemfeed.wiltsswindonramblers.org.uk");
 define("VERSION_NUMBER", "0.0.2");
 define("WALKFILE", "cache/allwalks");       // Cache file, name to be updated with groups
 define("NOTIFY", "webmaster@wiltsswindonramblers.org.uk");
@@ -32,9 +33,11 @@ require('classes/autoload.php');
 spl_autoload_register('autoload');
 
 //Get Command line parameters
+Functions::wm_log(SITE_ROOT . $_SERVER["REQUEST_URI"]);
 try {
     $opts = new Options();
     $groupCode = strtoupper($opts->gets("groups")) ;
+    if (trim($groupCode) == "") { $groupCode = null; }
     $days = $opts->gets("days");
     $distance = $opts->gets("distance");
     $limit = $opts->gets("limit"); 
@@ -43,6 +46,8 @@ try {
     $useGWEM = $opts->gets("usegwem");
     $useWM = $opts->gets("usewm");
     $ids = $opts->gets("ids");
+    $date_start = $opts->gets("date_start");
+    $date_end = $opts->gets("date_end");
 }
 catch (Error $e)
 {
@@ -52,11 +57,22 @@ catch (Error $e)
 
 //Only return walks for the Group
 try {
+    $urlOpts = new StdClass();
+    $urlOpts->date_start = $date_start;
+    $urlOpts->date_end = $date_end;
+    $urlOpts->groupCode = $groupCode;
+    $urlOpts->days = $days;
+    $urlOpts->limit = $limit;
+    $urlOpts->ids = $ids;
+
+    // Ensure the URL Parameters are valid.
+    Functions::ValidateWMURLParameters($urlOpts);
+
     $gwemurl = GWEMFEED ;
     $wmurl = WALKMANAGER ;
     $walkfile = Functions::getWalkFileName(WALKFILE, $groupCode);
-    $gwemurl = Functions::getGWEMFeedURL(GWEMFEED, $groupCode, $ids);
-    $wmurl = Functions::getWMFeedURL(WALKMANAGER, $groupCode, $ids);
+    $gwemurl = Functions::getGWEMFeedURL(GWEMFEED, $urlOpts);
+    $wmurl = Functions::getWMFeedURL(WALKMANAGER, $urlOpts);
     
 }
 catch (Error $e)
