@@ -137,7 +137,7 @@ class Functions {
     {
         $logfile = $_SERVER['DOCUMENT_ROOT'] . "/wm_log.txt" ;
         // Log the Message but prepend the date and time. 
-        error_log(date(SELF::TIMEFORMAT) . " - " . $msg . "\n", 3, $logfile);
+        //error_log(date(SELF::TIMEFORMAT) . " - " . $msg . "\n", 3, $logfile);
     }
 
     public static function wm_error(Error $e, $wm_walk, $msg, $die = false)
