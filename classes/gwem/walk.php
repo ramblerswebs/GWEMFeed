@@ -85,7 +85,7 @@ class GwemWalk {
             $this->walkContact->contact->displayName = $wm_walk->walk_leader->name ;                                    // walk_leaders
             $this->walkContact->contact->email = $wm_walk->walk_leader->email_form;
             $this->walkContact->contact->telephone1 = $wm_walk->walk_leader->telephone;
-            $this->walkLeader = $wm_walk->walk_leaders->name ;                              // walk_leaders         
+            $this->walkLeader = $wm_walk->walk_leader->name ;                              // walk_leaders         
         }
         else{
             $this->walkContact->contact->displayName = "Not Available" ;                                    // walk_leaders
@@ -96,7 +96,7 @@ class GwemWalk {
         }
         $this->walkContact->isWalkLeader = true;
         $this->walkContact->contact->telephone2 = "";
-        $this->walkContact->contact->groupCode = $wm_walk->group_code;
+        //$this->walkContact->contact->groupCode = $wm_walk->group_code;
 
         $this->linkedWalks = new stdClass();
         $this->linkedWalks->items = array();
@@ -105,7 +105,7 @@ class GwemWalk {
         $this->description = $wm_walk->description ;
         $this->groupCode = $wm_walk->group_code;
         $this->groupName = $wm_walk->group_name;
-        $this->additionalNotes = "";
+        $this->additionalNotes = $wm_walk->additional_details;
         $walkDate = DateTime::createFromFormat(self::WM_TIMEFORMAT, $wm_walk->start_date_time);
         if ($walkDate) {
             try {
@@ -129,8 +129,10 @@ class GwemWalk {
         $this->theme->items = array();
         $this->specialStatus = new stdClass();
         $this->specialStatus->items = array();
-        $this->facilities = new stdClass();                       // facilities
-        $this->facilities->items = array();
+        $this->facilities = new stdClass();
+        $this->map_services($wm_walk->facilities, $this->facilities);
+        $this->map_services($wm_walk->accessibility, $this->suitability);
+        $this->map_services($wm_walk->transport, $this->facilities);
         $this->pace = "";
         $this->ascentMetres = $wm_walk->ascent_metres;
         $this->ascentFeet = $wm_walk->ascent_feet;
@@ -144,6 +146,18 @@ class GwemWalk {
         $dateCreated = DateTime::createFromFormat(self::WM_TIMEFORMAT, $wm_walk->date_created);
         if ($dateCreated) { $this->dateCreated = $dateCreated->format("Y-m-d\TH:i:sP"); }
         $this->media = array();
+        $mediacount = 0;
+        if ($wm_walk->media != null)
+        {
+            foreach($wm_walk->media as $walkmedia)
+            {
+                $this->media[$mediacount] = new stdClass();
+                $this->media[$mediacount]->caption = $wm_walk->media[$mediacount]->alt;
+                $this->media[$mediacount]->copyright = "";
+                $this->media[$mediacount]->fileName =  $wm_walk->media[$mediacount]->styles[2]->url;
+                $mediacount++;
+            }
+        }
 
         // Build up the points to store
         $this->points = array() ;                      // start_location, meeting_location
@@ -157,15 +171,31 @@ class GwemWalk {
             $len = count($this->points);
             $this->points[$len] = $this->location2point($wm_walk->meeting_location, "Meeting", $wm_walk->meeting_date_time);
         }
-        if ($wm_walk->finish_location)
+        if ($wm_walk->end_location)
         {
             $len = count($this->points);
-            $this->points[$len] = $this->location2point($wm_walk->finish_location, "End", $wm_walk->end_date_time);
+            $this->points[$len] = $this->location2point($wm_walk->end_location, "End", $wm_walk->end_date_time);
         }
         $this->groupInvite = new stdClass(); 
         $this->groupInvite->groupCode = null;       // groups_invited   ??
         $this->isLinear = strtolower($wm_walk->shape) == "linear" ? TRUE : FALSE; 
         $this->url = $wm_walk->url;
+    }
+
+    private function map_services($source, $dest )
+    {
+        $entry = 0;
+        if ($source != null)
+        {
+            $dest->items = array();
+            foreach($source as $item)
+            {
+                $dest->items[$entry] = new stdClass();
+                $dest->items[$entry]->text = $source[$entry]->description ;
+                $entry++;
+            }
+        }                       // facilities
+
     }
 
     private function location2point($location, $typeString, $tmPoint)
