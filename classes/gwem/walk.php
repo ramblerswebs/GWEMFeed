@@ -154,7 +154,9 @@ class GwemWalk {
                 $this->media[$mediacount] = new stdClass();
                 $this->media[$mediacount]->caption = $wm_walk->media[$mediacount]->alt;
                 $this->media[$mediacount]->copyright = "";
-                $this->media[$mediacount]->fileName =  $wm_walk->media[$mediacount]->styles[2]->url;
+                $pos = strrpos($wm_walk->media[$mediacount]->styles[2]->url,'/', 0);
+                $this->media[$mediacount]->url =  substr($wm_walk->media[$mediacount]->styles[2]->url, 0 , $pos);
+                $this->media[$mediacount]->fileName = substr($wm_walk->media[$mediacount]->styles[2]->url, $pos+1);
                 $mediacount++;
             }
         }
