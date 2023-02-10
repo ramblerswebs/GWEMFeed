@@ -83,7 +83,8 @@ class GwemWalk {
         if ($wm_walk->walk_leader != null)
         {
             $this->walkContact->contact->displayName = $wm_walk->walk_leader->name ;                                    // walk_leaders
-            $this->walkContact->contact->email = $wm_walk->walk_leader->email_form;
+            //$this->walkContact->contact->email = null ;
+            $this->walkContact->contact->form = $wm_walk->walk_leader->email_form;
             $this->walkContact->contact->telephone1 = $wm_walk->walk_leader->telephone;
             $this->walkLeader = $wm_walk->walk_leader->name ;                              // walk_leaders         
         }
@@ -94,7 +95,7 @@ class GwemWalk {
             $this->walkLeader = "Not Available";                              // walk_leaders         
 
         }
-        $this->walkContact->isWalkLeader = true;
+        $this->walkContact->isWalkLeader = false;
         $this->walkContact->contact->telephone2 = "";
         //$this->walkContact->contact->groupCode = $wm_walk->group_code;
 
