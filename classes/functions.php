@@ -13,6 +13,7 @@
  */
 class Functions {
     const TIMEFORMAT = "Y-m-d\TH:i:s";
+    const TASK = "GWEMFeed";
 
     public static function determineUse($default, $usersetting) {
         // Calculate if we should be using this value, check the user supplied value first
@@ -225,9 +226,10 @@ class Functions {
         return $url ;
     }
 
-    public static function getWMFeedURL($base, $urlOpts)
+    public static function getWMFeedURL($base, $apikey, $urlOpts)
     {
         $url = $base ;
+        $url = $url . "&api-key=" . $apikey;
         if ($urlOpts->ids != null)
         {
             // walk id's have been specified so we need to return specific walks
@@ -331,12 +333,12 @@ class Functions {
         $mailer->addAddress(NOTIFY, 'Web Master');
         $mailer->isHTML(true);
         $mailer->Subject = "Ramblers Feed Error";
-        $mailer->Body = "<p>Feed error found while running: " . TASK . "</p>".
+        $mailer->Body = "<p>Feed error found while running: " . self::TASK . "</p>".
                 "<p>Feed: ".$feed. "</p>"
                 . "<p>Error: ". $error . "</p>";
         // $mailer->send();
         echo "Error message sent" . BR;
-        echo "Task: " . TASK . BR;
+        echo "Task: " . self::TASK . BR;
         echo "Feed: " . $feed . BR;
         echo "Error: " . $error . BR;
     }

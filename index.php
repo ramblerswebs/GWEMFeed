@@ -11,6 +11,7 @@ define("WALKFILE", "cache/allwalks");       // Cache file, name to be updated wi
 define("NOTIFY", "webmaster@wiltsswindonramblers.org.uk");
 define("GWEMFEED", "https://www.ramblers.org.uk/api/lbs/walks");
 define("WALKMANAGER", "https://uat-be.ramblers.nomensa.xyz/api/volunteers/walksevents?types=group-walk");
+define("APIKEY", "9bb64644a649a2196942d2793c3f9a99");
 
 //define("RAMBLERSWEBSSITES", "https://sites.ramblers-webs.org.uk/feed.php");
 define("BR", "<br>");
@@ -72,7 +73,7 @@ try {
     $wmurl = WALKMANAGER ;
     $walkfile = Functions::getWalkFileName(WALKFILE, $groupCode);
     $gwemurl = Functions::getGWEMFeedURL(GWEMFEED, $urlOpts);
-    $wmurl = Functions::getWMFeedURL(WALKMANAGER, $urlOpts);
+    $wmurl = Functions::getWMFeedURL(WALKMANAGER, APIKEY, $urlOpts);
     
 }
 catch (Error $e)
