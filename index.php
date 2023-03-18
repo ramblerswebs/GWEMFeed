@@ -10,10 +10,17 @@ define("VERSION_NUMBER", "0.0.2");
 define("WALKFILE", "cache/allwalks");       // Cache file, name to be updated with groups
 define("NOTIFY", "webmaster@wiltsswindonramblers.org.uk");
 define("GWEMFEED", "https://www.ramblers.org.uk/api/lbs/walks");
-define("WALKMANAGER", "https://uat-be.ramblers.nomensa.xyz/api/volunteers/walksevents?types=group-walk");
-define("APIKEY", "9bb64644a649a2196942d2793c3f9a99");
+// Test Site Definitinon Below
+//define("WALKMANAGER", "https://uat-be.ramblers.nomensa.xyz/api/volunteers/walksevents?types=group-walk");
+
+// Live Site Definition Below
+define("WALKMANAGER", "https://walks-manager.ramblers.org.uk/api/volunteers/walksevents?types=group-walk");
+
+// API Key for the active site (UAT or Live)
+define("APIKEY", "");
 
 //define("RAMBLERSWEBSSITES", "https://sites.ramblers-webs.org.uk/feed.php");
+// Default to using Walks Manager
 define("BR", "<br>");
 define("USECACHE", "0");    // Default option as to whether to use a cache store
 define("USEGWEM", "0");     // Default option as to whether to search GWEM for details
