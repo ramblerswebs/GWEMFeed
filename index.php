@@ -11,7 +11,7 @@ define("WALKFILE", "cache/allwalks");       // Cache file, name to be updated wi
 define("NOTIFY", "webmaster@wiltsswindonramblers.org.uk");
 define("GWEMFEED", "https://www.ramblers.org.uk/api/lbs/walks");
 // Test Site Definitinon Below
-//define("WALKMANAGER", "https://uat-be.ramblers.nomensa.xyz/api/volunteers/walksevents?types=group-walk");
+//define("WALKMANAGER", "https://uat-be.ramblers.org.uk/api/volunteers/walksevents?types=group-walk");
 
 // Live Site Definition Below
 define("WALKMANAGER", "https://walks-manager.ramblers.org.uk/api/volunteers/walksevents?types=group-walk");
