@@ -67,7 +67,7 @@ class GwemWalk {
         $this->status->value = ($wm_walk->status == "confirmed") ? "published" : "cancelled";
 
         $this->difficulty = new stdClass();
-        $this->difficulty->text = ($wm_walk->difficulty != false) ? $wm_walk->difficulty->description : "Unknown";
+        $this->difficulty->text = ($wm_walk->difficulty != false) ? $wm_walk->difficulty->description : "Moderate";
         // Correct the case sensitivity
         if ($this->difficulty->text == "Easy access") {
             $this->difficulty->text = "Easy Access";
