@@ -89,10 +89,10 @@ class GwemWalk {
             $this->walkLeader = $wm_walk->walk_leader->name ;                              // walk_leaders         
         }
         else{
-            $this->walkContact->contact->displayName = "Not Available" ;                                    // walk_leaders
-            $this->walkContact->contact->email = "Not Available";
-            $this->walkContact->contact->telephone1 = "Not Available";
-            $this->walkLeader = "Not Available";                              // walk_leaders         
+            $this->walkContact->contact->displayName = "" ;                                    // walk_leaders
+            $this->walkContact->contact->email = "";
+            $this->walkContact->contact->telephone1 = "";
+            $this->walkLeader = "";                              // walk_leaders         
 
         }
         $this->walkContact->isWalkLeader = false;
