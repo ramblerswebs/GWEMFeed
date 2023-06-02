@@ -58,6 +58,7 @@ class GwemWalk {
     public $groupInvite;     // groups_invited   ??
     public $isLinear;        // shape
     public $url;             // url
+    public $external_url;    // external URL
 
     public function __construct($wm_walk) {
 
@@ -180,6 +181,7 @@ class GwemWalk {
         $this->groupInvite->groupCode = null;       // groups_invited   ??
         $this->isLinear = strtolower($wm_walk->shape) == "linear" ? TRUE : FALSE; 
         $this->url = $wm_walk->url;
+        $this->external_url = $wm_walk->external_url;
     }
 
     private function map_services($source, $dest )
