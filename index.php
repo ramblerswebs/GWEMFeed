@@ -26,7 +26,7 @@ define("USECACHE", "0");    // Default option as to whether to use a cache store
 define("USEGWEM", "0");     // Default option as to whether to search GWEM for details
 define("USEWM", "1");       // Default option as to whether to search Walks Manager for details
 define("INCWALKS", "1");       // Default option as to whether to search for Walk information
-define("INCEVENTS", "0");       // Default option as to whether to search for event information
+define("INCEVENTS", "1");       // Default option as to whether to search for event information
 
 // 	First Release
 if (version_compare(PHP_VERSION, '7.4.0') < 0) {
