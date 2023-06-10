@@ -5,19 +5,19 @@ ini_set('display_errors', 1);
 ini_set('assert.warning', 1);
 ini_set('default_socket_timeout', 120);
 
-define("SITE_ROOT","http://gwemfeed.wiltsswindonramblers.org.uk");
+define("SITE_ROOT","http://gwem.theramblers.org.uk");
 define("VERSION_NUMBER", "0.0.2");
 define("WALKFILE", "cache/allwalks");       // Cache file, name to be updated with groups
 define("NOTIFY", "webmaster@wiltsswindonramblers.org.uk");
 define("GWEMFEED", "https://www.ramblers.org.uk/api/lbs/walks");
 // Test Site Definitinon Below
-//define("WALKMANAGER", "https://uat-be.ramblers.org.uk/api/volunteers/walksevents?types=group-walk");
+//define("WALKMANAGER", "https://uat-be.ramblers.nomensa.xyz/api/volunteers/walksevents?types=group-walk");
 
 // Live Site Definition Below
-define("WALKMANAGER", "https://walks-manager.ramblers.org.uk/api/volunteers/walksevents?types=group-walk");
+define("WALKMANAGER", "https://walks-manager.ramblers.org.uk/api/volunteers/walksevents?");
 
 // API Key for the active site (UAT or Live)
-define("APIKEY", "");
+define("APIKEY", "853aa876db0a37ff0e6780db2d2addee");
 
 //define("RAMBLERSWEBSSITES", "https://sites.ramblers-webs.org.uk/feed.php");
 // Default to using Walks Manager
@@ -25,6 +25,8 @@ define("BR", "<br>");
 define("USECACHE", "0");    // Default option as to whether to use a cache store
 define("USEGWEM", "0");     // Default option as to whether to search GWEM for details
 define("USEWM", "1");       // Default option as to whether to search Walks Manager for details
+define("INCWALKS", "1");       // Default option as to whether to search for Walk information
+define("INCEVENTS", "0");       // Default option as to whether to search for event information
 
 // 	First Release
 if (version_compare(PHP_VERSION, '7.4.0') < 0) {
@@ -42,7 +44,7 @@ spl_autoload_register('autoload');
 
 //Get Command line parameters
 Functions::wm_log(SITE_ROOT . $_SERVER["REQUEST_URI"]);
-try {
+try{
     $opts = new Options();
     $groupCode = strtoupper($opts->gets("groups")) ;
     if (trim($groupCode) == "") { $groupCode = null; }
@@ -56,6 +58,9 @@ try {
     $ids = $opts->gets("ids");
     $date_start = $opts->gets("date_start");
     $date_end = $opts->gets("date_end");
+    $include_walks = $opts->gets("incwalks");
+    $include_events = $opts->gets("incevents");
+    
 }
 catch (Error $e)
 {
@@ -72,6 +77,8 @@ try {
     $urlOpts->days = $days;
     $urlOpts->limit = $limit;
     $urlOpts->ids = $ids;
+    $urlOpts->include_walks = Functions::determineUse(INCWALKS,$include_walks);
+    $urlOpts->include_events = Functions::determineUse(INCEVENTS,$include_events);
 
     // Ensure the URL Parameters are valid.
     Functions::ValidateWMURLParameters($urlOpts);

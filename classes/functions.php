@@ -138,7 +138,7 @@ class Functions {
     {
         $logfile = $_SERVER['DOCUMENT_ROOT'] . "/wm_log.txt" ;
         // Log the Message but prepend the date and time. 
-        //error_log(date(SELF::TIMEFORMAT) . " - " . $msg . "\n", 3, $logfile);
+        // error_log(date(SELF::TIMEFORMAT) . " - " . $msg . "\n", 3, $logfile);
     }
 
     public static function wm_error(Error $e, $wm_walk, $msg, $die = false)
@@ -228,8 +228,15 @@ class Functions {
 
     public static function getWMFeedURL($base, $apikey, $urlOpts)
     {
+        //types=group-walk
         $url = $base ;
-        $url = $url . "&api-key=" . $apikey;
+        $url = $url . "api-key=" . $apikey;
+        // Now add the type of information to return
+        $types = ($urlOpts->include_walks) ? "group-walk" : "" ;
+        $types = ($urlOpts->include_events) ? ((strlen($types) > 0) ? $types . ",group-event" : "group-event") : $types ;
+        if (strlen($types) <= 0) $types = "group-walk";
+        $url = $url . "&types=" . $types ;
+
         if ($urlOpts->ids != null)
         {
             // walk id's have been specified so we need to return specific walks
