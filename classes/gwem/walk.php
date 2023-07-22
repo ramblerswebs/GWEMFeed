@@ -62,7 +62,7 @@ class GwemWalk {
 
     public function __construct($wm_walk)
     {
-        $this->type = strtolower($wm_walk->type);
+        $this->type = strtolower($wm_walk->item_type);
         switch (strtolower($this->type))
         {
             case "group-event":
