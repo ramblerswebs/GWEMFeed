@@ -252,7 +252,7 @@ class Functions {
             $url = $url . '&limit=' . $urlOpts->limit;
             $url = $url . '&days=' . $urlOpts->days;  
         }
-        Functions::wm_log($url);
+        //Functions::wm_log($url);
         return $url ;
     }
     public static function startsWith($haystack, $needle) {
