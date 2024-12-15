@@ -42,6 +42,13 @@ $key = NULL;
 require('classes/autoload.php');
 spl_autoload_register('autoload');
 
+try {
+    Functions::wm_log('HTTP_REFERER : ' . $_SERVER["HTTP_REFERER"] . ', REMOTE_ADDR : ' . $_SERVER["REMOTE_ADDR"] . ', REMOTE_HOST : ' . $_SERVER["REMOTE_HOST"] );
+} catch (Error $e)
+{
+    Functions::wm_log('*** Unable to obtain Server Variables ****');
+}
+
 //Get Command line parameters
 Functions::wm_log(SITE_ROOT . $_SERVER["REQUEST_URI"]);
 try{
